@@ -74,14 +74,26 @@ class WikipediaPage(wikipedia.WikipediaPage):
     ATTRS = ["categories","content","summary","images","links","original_title","pageid","parentid","references","summary","url"]
 
 
-    def get_categories(self):
+    def get_categories(self,as_string = False):
         cats = self.categories
         cats = [cat.rsplit(":",1)[-1] for cat in cats]
-        return cats
+
+        if as_string:
+            return "|".join(cats)
+        else:
+            return cats
 
 
     def has_category_like(self,query):
-        return query.lower() in "|".join(self.get_categories()).lower()
+        return query.lower() in self.get_categories(as_string = True).lower()
+
+
+    def is_animal(self):
+
+        # Hardcoded category info
+        taxobox = "taxobox-animal"
+
+        return taxobox in self.get_categories(as_string = True).lower() 
 
 
     def get_latin_name(self):
