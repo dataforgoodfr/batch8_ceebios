@@ -22,6 +22,9 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 
 from pygbif import species
 from scipy import sparse
+import pickle
+from scipy.spatial import distance
+
 
 
 if False: # local desktop working
@@ -113,27 +116,31 @@ def create_Tf_matrix(corpus, \
 
 def create_TfIdf(corpus, \
                      filename_npz='../data/tfidf/data_tfidf.npz', \
-                     filename_features="../data/tfidf/data_tfidf_feature_names.pkl"):
+                     filename_features="../data/tfidf/data_tfidf_feature_names.pkl",
+                     vectorizer_path="../data/tfidf/tfidf_vectorizer.pickle"):
     '''    
     Création de la matrice pondérée TF-IDF (Term Frequency times Inverse Document Frequency)
     La matrice TF-IDF est une mesure qui permet de faire de la ségrégation entre documents.
     Si un mot a une très haute fréquence dans une question, mais une fréquence basse dans les autres questions du corpus,
     c’est qu’il s’agit d’un mot important pour caractériser le document en question.
     '''
-    vectorizer = TfidfVectorizer(max_features=len(corpus))
-    X = vectorizer.fit_transform(corpus)
+    vectorizer_model = TfidfVectorizer(max_features=len(corpus))
+    X = vectorizer_model.fit_transform(corpus)
     print('-Tfidf matrix, ', X.toarray().shape)
     print(' first line:')
     print(X.toarray()[0])
     
-    print('- Nombre de features :'+str(len(vectorizer.get_feature_names())))
-    print(vectorizer.get_feature_names()[0:10], ' ...')
+    print('- Nombre de features :'+str(len(vectorizer_model.get_feature_names())))
+    print(vectorizer_model.get_feature_names()[0:10], ' ...')
     
-    data = pd.DataFrame(vectorizer.get_feature_names())
+    data = pd.DataFrame(vectorizer_model.get_feature_names())
     data.to_pickle(filename_features) 
     print('tfidf feature names - saved')
     sparse.save_npz(filename_npz, X)
     print('tfidf matrix:', filename_npz,' - saved')
+    
+    pickle.dump(vectorizer_model, open(vectorizer_path, "wb"))
+    print('vectorizer model:', vectorizer_path,' - saved')
 
 
 def read_clean_dataset(fname, disp_first=True):
@@ -174,8 +181,7 @@ def load_clean_and_generate_tf_idf(fname="../data/tfidf/data_gbif.json"):
     dataset = read_clean_dataset(fname)
     print('- Verification:')
     display(dataset.head())
-    
-    
+        
     dataset['freq'] = dataset['terms'].apply(lambda x: FreqDist(x))
     
     #fdist1 : frequence dans le tableau de mots
@@ -196,6 +202,88 @@ def load_clean_and_generate_tf_idf(fname="../data/tfidf/data_gbif.json"):
     create_Tf_matrix(corpus)
     print('- create tfidf matrix')
     create_TfIdf(corpus)
+
+def load_tfidf(filename_npz='../data/tfidf/data_tfidf.npz', \
+               filename_features="../data/tfidf/data_tfidf_feature_names.pkl",\
+               vectorizer_path="../data/tfidf/tfidf_vectorizer.pickle",\
+               transform_example=True):
+    ''' Load tfidf weights function '''
+    ''' Input filenames: tfidf, feature names, vectorizer 
+        Output: 
+        - data names, X tfidf weight, vectorizer
+    '''
     
+    data_names = pd.read_pickle(filename_features)
+    X = sparse.load_npz(filename_npz)
+    vectorizer_model = pickle.load(open(vectorizer_path,'rb'))
     
+    if transform_example==True:
+        print('-Example of transform names, with query', )
+        query = ['zygnematophyceae zygomycota']
+        print('-Example of transform names, with query', query)
+        print(' result vector:')
+        x_request = vectorizer_model.transform(query)
+        x0 = x_request.toarray()
+        print(x0.shape)
+        print(x0)
+    
+    return data_names, X, vectorizer_model
+    
+
+def transform_query(vectorizer_model, query):
+    ''' transform query in vector '''
+    x_request = vectorizer_model.transform(query)
+    x0 = x_request.toarray()
+    return x0
+    
+def test_dist():
+    data_names, X, vectorizer_model = load_tfidf()
+    
+    print(" load dataset, and clean")
+    fname = "../data/tfidf/data_gbif.json"
+    dataset = read_clean_dataset(fname)
+    
+    print('- Verification:')
+    print('head:')
+    display(dataset['terms'].head())
+    print('tail:')
+    display(dataset['terms'].tail())
+
+    query = ['zygnematophyceae zygomycota']
+    x0 = transform_query(vectorizer_model, query)
+    
+    kind = ['braycurtis', 'canberra', 'chebyshev', 'cityblock', 'correlation', 'cosine', 'dice', 'euclidean', 'hamming', 'jaccard', \
+            'kulsinski', 'mahalanobis', 'matching', 'minkowski', 'rogerstanimoto',\
+            'russellrao', 'seuclidean', 'sokalmichener', 'sokalsneath', 'sqeuclidean', 'yule']
+    for metric in kind:
+        d = distance.cdist(x0, X.toarray(), metric)
+        print('metric', metric)
+        print(d)
+    
+    # 
+    print('Distance chebyshev Versus distance standard euclidian')
+    print('-----------------------------------------------------')
+    
+    metric_lst = ['chebyshev','seuclidean']
+    # The Chebyshev distance between two n-vectors u and v \
+    # is the maximum norm-1 distance between their respective elements.
+    # seuclidean = Computes the standardized Euclidean distance
+    
+    test_lst = ['anthocerotophyta',
+                'archaea kingdom accepted',
+                'chromista ochrophyta thalassiosirales']
+    for i, test in enumerate(test_lst):
+        x0 = transform_query(vectorizer_model, [test])
+        for metric in metric_lst:
+            d = distance.cdist(x0, X.toarray(), metric)[0]
+            print('query:',i+1,  '"', test, '"', ', metric:', metric)
+            # print('metric', metric)
+            # print('distances: ', d)               
+            index_lst = sorted(range(len(d)), key=lambda k: d[k])
+            dataset['d'] = d
+            # df = dataset.sort_values(by=['d'], ascending=True)            
+            print(dataset['terms'][index_lst[0:10]])
+            print()
+    
+        
             
