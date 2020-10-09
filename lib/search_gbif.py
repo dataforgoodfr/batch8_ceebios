@@ -16,6 +16,11 @@ import pprint
 import json
 import re
 import pandas as pd
+pd.set_option('display.max_rows', 500)
+pd.set_option('display.max_columns', 500)
+pd.set_option('display.width', 1000)
+pd.set_option('max_colwidth', 1000)
+
 from nltk.probability import FreqDist
 
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
@@ -24,7 +29,6 @@ from pygbif import species
 from scipy import sparse
 import pickle
 from scipy.spatial import distance
-
 
 
 if False: # local desktop working
@@ -243,11 +247,13 @@ def test_dist():
     fname = "../data/tfidf/data_gbif.json"
     dataset = read_clean_dataset(fname)
     
+    print('Data_names:', data_names)
+    
     print('- Verification:')
     print('head:')
-    display(dataset['terms'].head())
+    display(dataset['terms'].head(20))
     print('tail:')
-    display(dataset['terms'].tail())
+    print(dataset['terms'].tail())
 
     query = ['zygnematophyceae zygomycota']
     x0 = transform_query(vectorizer_model, query)
