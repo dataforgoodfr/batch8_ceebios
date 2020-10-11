@@ -5,13 +5,14 @@ import pandas as pd
 # from .gbif import BASE_GBIF_URL
 from .wikipedia import WikipediaExtractor,WikipediaError
 from .scholar import GoogleScholarExtractor
-
+from .coreac import CoreACExtractor
 
 
 EXAMPLE_SPECIES = [
     "Vespa Ducalis",
     "Balaenoptera musculus",
 ]
+
 
 
 class Species:
@@ -50,15 +51,14 @@ class Species:
         return f"Species(name={self.name})"
 
 
-    def search_publications(self,n = 5,as_df = True):
-        scholar = GoogleScholarExtractor()
-        publications = scholar.search(self.name,n = n)
+    def search_publications(self,n = 5,as_df = True, source='google'):
+        extractor = GoogleScholarExtractor() if source == 'google' else CoreACExtractor()
+        publications = extractor.search(self.name, n = n )
 
         if as_df:
             return pd.DataFrame([x.to_dict() for x in publications])
         else:
             return publications
-
 
     def fetch_description(self):
         # Deprecated
