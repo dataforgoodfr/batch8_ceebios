@@ -32,10 +32,13 @@ if species_str != "":
 
     st.markdown(f"## Species information")
 
-    img_url = species.get_wikipedia_image()
-    st.image(img_url,width = 200)
-    st.info(species.get_wikipedia_description()[:500] + " ...")
-    st.success(f"Learn more on [wikipedia page]({species.wikipedia_page.url})")
+    try:
+        img_url = species.get_wikipedia_image()
+        st.image(img_url,width = 200)
+        st.info(species.get_wikipedia_description()[:500] + " ...")
+        st.success(f"Learn more on [wikipedia page]({species.wikipedia_page.url})")
+    except:
+        st.error(f"Impossible to find information on Wikipedia for species {species_str}")
 
 
     st.markdown(f"## Searching scientific publications")
