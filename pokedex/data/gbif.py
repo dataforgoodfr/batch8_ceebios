@@ -71,10 +71,11 @@ class GBIFExtractor:
                     species = []
                     seen = []
                     for result in results:
-                        s = result["species"]
-                        if s not in seen:
-                            seen.append(s)
-                            species.append(result)
+                        if "species" in result:
+                            s = result["species"]
+                            if s not in seen:
+                                seen.append(s)
+                                species.append(result)
                 else:
                     species = results
 
