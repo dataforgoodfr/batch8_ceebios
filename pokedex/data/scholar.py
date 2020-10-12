@@ -24,7 +24,6 @@ class GoogleScholarExtractor:
     def __init__(self):
         pass
 
-
     def search(self,query,n = 5):
         ''' recherche d articles '''           
         search_query = scholarly.search_pubs(query)
@@ -37,8 +36,6 @@ class GoogleScholarExtractor:
                 print(f"Stopped because of {e}")
                 return pubs
         return pubs
-            
-
 
 
 def get_author(generator):

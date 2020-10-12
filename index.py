@@ -43,7 +43,8 @@ if species_str != "":
 
     st.markdown(f"## Searching scientific publications")
     n_pubs = st.slider("Number of publications",min_value = 1,max_value = 100,value = 5)
-    pubs = species.search_publications(n = n_pubs,as_df = False)
+    source = st.selectbox('Data source',('coreac', 'google'))
+    pubs = species.search_publications(n = n_pubs,as_df = False,source = source)
 
     for pub in pubs:
 
