@@ -31,7 +31,7 @@ class GoogleScholarExtractor:
         for i in range(n):
             try:
                 pub = next(search_query)
-                pubs.append(Publication(scholar_data = pub))
+                pubs.append(Publication.from_scholar(pub))
             except Exception as e:
                 print(f"Stopped because of {e}")
                 return pubs

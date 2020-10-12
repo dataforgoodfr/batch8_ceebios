@@ -13,22 +13,24 @@ DATA_MODEL = [
 ]
 
 class Publication:
-    def __init__(self,scholar_data = None):
+    def __init__(self):
+        pass
 
-        if scholar_data is not None:
-            self.load_from_scholar(scholar_data)
 
-    def load_from_scholar(self,data):
-        self._data = data
+    @classmethod
+    def from_scholar(cls,data):
+        pub = Publication()
+        pub.data = data
         bib = data.bib
-        self.title = bib.get("title")
-        self.abstract = bib.get("abstract")
-        self.author = bib.get("author")
-        self.url = bib.get("url")
-        self.journal = bib.get("journal")
-        self.cites = bib.get("cites")
-        self.year = bib.get("year")
-        self.doi = None
+        pub.title = bib.get("title")
+        pub.abstract = bib.get("abstract")
+        pub.author = bib.get("author")
+        pub.url = bib.get("url")
+        pub.journal = bib.get("journal")
+        pub.cites = bib.get("cites")
+        pub.year = bib.get("year")
+        pub.doi = None
+        return pub
 
     @classmethod
     def from_coreac(cls, data):
