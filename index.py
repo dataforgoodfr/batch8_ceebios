@@ -4,7 +4,9 @@ import pandas as pd
 
 
 from pokedex.data import GBIFExtractor
+from pokedex.data import load_scimagojrdb
 
+scimagojrdb = load_scimagojrdb()
 
 # Fuzzy search for all species 
 st.sidebar.image("app/img/logo-ceebios.png",use_column_width = True)
@@ -48,7 +50,15 @@ if species_str != "":
 
     for pub in pubs:
 
-        info = f"""#### [{pub.title}]({pub.url})\n{pub.abstract}\n*{pub.year} - {"-".join(pub.author)}*"""
+        info = f"""#### [{pub.title}]({pub.url})\n{pub.abstract}\n*{pub.year} - {pub.author}*"""
+        
+        # append the journal name and categories
+        if pub.journal:
+            info += f'\n\n {pub.journal}'
+            categories = scimagojrdb.find_categories(pub.journal)
+            if categories:
+                info += f' ({",".join(categories)})'
+            
         st.info(info)
 
         # st.write(pubs["title"].tolist())
