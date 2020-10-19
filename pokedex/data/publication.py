@@ -20,6 +20,9 @@ class Publication:
     @classmethod
     def from_scholar(cls,data):
         pub = Publication()
+        # Be sure we have the journal
+        # name
+        data.fill()
         pub.data = data
         bib = data.bib
         pub.title = bib.get("title")
