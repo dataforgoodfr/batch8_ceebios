@@ -41,8 +41,10 @@ pd.set_option('max_colwidth', 1000)
 
 
 if False: # local desktop working
-    os.chdir('D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/lib')
+    os.chdir('D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/base_open_source')
     print(os.getcwd())
+
+from scispacy_lib import explore__text_byScispacy
 
 def read_parameters(argv):
     ''' definition ou lecture des parametres d'entree '''
@@ -113,6 +115,13 @@ def main(argv=[]):
     print(df.shape)
     print(list(df.columns))
     print(df.head(1))
+    
+    dfa = df[df['paperAbstract']!='']
+    dfa.reset_index(drop=True, inplace=True)
+    display(dfa['paperAbstract'].loc[0])
+    x = dfa['paperAbstract'].loc[0]
+    explore__text_byScispacy(x)
+    
 
 if __name__ == "__main__":
     main(sys.argv[1:])
