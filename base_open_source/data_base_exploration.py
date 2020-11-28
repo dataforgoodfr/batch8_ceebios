@@ -32,7 +32,7 @@ pp = pprint.PrettyPrinter(2)
 import json
 import re
 import pandas as pd
-
+from sklearn.feature_extraction.text import CountVectorizer
 
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
@@ -72,6 +72,114 @@ def read_parameters(argv):
     return path
 
 
+def add_rows(r):
+    global dh
+    
+    k = r['key']
+    name_lst = r['name_lst']
+    for word in name_lst:
+        dh = dh.append({'key':k, 'canonicalName': word}, ignore_index=True)
+
+
+df_canonicalName = None
+vectorizer_canonicalName = None
+def search_canonicalName(sentence):
+    global df_canonicalName
+    global vectorizer_canonicalName
+    
+def read_gbif_extract_csv(file_name='../data/gbif_extract.csv',\
+                          important_cols=['key', 'canonicalName'],\
+                          output_file='../data/gbif_extract_canonicalName_short.csv'):
+    ''' load gbif csv data base '''
+    global df_canonicalName
+    global vectorizer_canonicalName
+    
+    df = pd.read_csv(file_name)
+    print(df.shape, list(df.columns))    
+    df = df[important_cols]    
+    # print(df.head(10))
+    for c in list(df.columns):
+        if c.find("Key")==-1:
+            df[c] = df[c].apply(str).str.lower()
+    print(df.shape, list(df.columns))    
+    print('canonicalName:')
+    print(df.head(10))
+    df['name_lst'] = df['canonicalName'].apply(lambda x: x.split(' '))
+    df['size'] = df['name_lst'].apply(lambda x: len(x))
+    print(df['size'].describe())
+    ##### output
+    print('Output file with short reduce canonical name:', output_file)
+    print('- to find canonical name in abstract sci. papers')    
+    tot_rows = df.shape[0]
+    ts = time.time()
+    total_read = 0
+    total_write = 0
+    dct = {}
+    with open(output_file, 'w') as f:
+        f.write('canonicalName_word;tab_key\n')
+        for i, r in df.iterrows():
+            total_read += 1
+            if time.time()-ts>10:
+                ts = time.time()
+                print(total_read, '/', tot_rows, round(total_read/tot_rows*100, 2), '%')
+            if r['key'] is None:
+                continue
+            if r['size']==1:
+                name = r['canonicalName']
+                # dct[name] = [r['key']]
+                # print(name, dct[name], 'name first in')
+                f.write(name+';'+str(r['key'])+'\n')
+                total_write += 1
+                continue
+            for name in r['name_lst']:
+                f.write(name+';'+str(r['key'])+'\n')
+                total_write += 1
+            continue                
+        print('Data report:', 'total_read', total_read, 'total_write', total_write)
+    print('End file generated:', output_file)
+    
+    if False:
+        text = df['canonicalName'].values    
+        # create the transform
+        vectorizer_canonicalName = CountVectorizer()
+        # tokenize and build vocab
+        vectorizer_canonicalName.fit(text)
+        
+        # summarize
+        print('len vectorizer.vocabulary_):', len(vectorizer.vocabulary_))
+        print('canonicalName:')
+        i = 0
+        for k, v in vectorizer_canonicalName.vocabulary_.items():
+            print(k, v)
+            i += 1
+            if i>10:
+                break
+        # encode document*
+        text = 'psygmatocerus guianensis'
+        vector = vectorizer.transform([text])  
+        vector.toarray()
+        
+        text_out = vectorizer.inverse_transform(vector)
+        print(text_out)
+        
+        dataX = []
+        dataY = []
+        for i, r in df_canonicalName.iterrows():
+            dataY.append(int(r['key']))
+            v = vectorizer_canonicalName.transform([r['canonicalName']])
+            dataX.append(list(v.toarray()[0]))
+        n_patterns = len(dataX)
+        print ("Total Patterns: ", n_patterns)
+    
+        # define the LSTM model
+        model = Sequential()
+        model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2])))
+        model.add(Dropout(0.2))
+        model.add(Dense(y.shape[1], activation='softmax'))
+        model.compile(loss='categorical_crossentropy', optimizer='adam')            
+    
+    
+    
 def get_gz_tab_files(path):
     ''' create a list of compressed gz files downloades '''
     path2 = path + '/*.gz'
