@@ -1,0 +1,28 @@
+type Node {
+  name: String
+  rank: String
+  children: [Node] @relation(name: "CHILDREN", direction: "OUT")
+  documents: [Document] @relation(name: "IS_MENTIONED_IN", direction: "OUT")
+  habitat: [Habitat] @relation(name: "LIVES_IN", direction: "OUT")
+  siblings: [Node]
+    @cypher(
+      statement: "MATCH(parent)-[:CHILDREN]->(this) MATCH(parent)-[:CHILDREN]->(siblings) WHERE siblings <> this RETURN siblings"
+    )
+}
+
+type Document {
+  title: String
+  type: String
+  summary: String
+  authors: [Author] @relation(name: "WROTE", direction: "IN")
+  entities: [Node] @relation(name: "IS_MENTIONED_IN", direction: "IN")
+}
+
+type Author {
+  name: String
+  publications: [Document] @relation(name: "WROTE", direction: "OUT")
+}
+
+type Habitat {
+  name: String
+}
