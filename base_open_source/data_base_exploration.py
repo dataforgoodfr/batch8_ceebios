@@ -136,6 +136,7 @@ def read_gbif_extract_csvCategorical(file_name='../data/gbif_extract.csv'):
     dg = pd.concat([df_cat, df_genus, df_species])
     
     dg.reset_index(drop=True, inplace=True)
+    dg.to_csv(output_file_categories, sep=';')
     print('df_cat', dg.shape)
     print('df ', 'categories = [family+genus+species]', ' generate:', output_file_categories)
     return dg
