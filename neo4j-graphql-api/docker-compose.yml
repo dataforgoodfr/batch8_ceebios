@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  neo4j:
+    build: ./neo4j
+    ports:
+        - 7474:7474
+        - 6477:6477
+        - 7687:7687
+    volumes: 
+        - ~/logs/:/logs/             
+        - ~/data:/data
+        - ~/plugins:/plugins
+        - ~/conf:/conf
+    environment: 
+        - NEO4J_AUTH=${NEO4J_AUTH}
+        - NEO4J_dbms_allow__upgrade=true
+        - NEO4JLABS_PLUGINS=["apoc"]
+    restart: unless-stopped
+  api:
+    build: ./api
+    ports:
+      - 4001:4001
+    links:
+      - neo4j
+    depends_on:
+      - neo4j
