@@ -79,24 +79,82 @@ def add_rows(r):
     name_lst = r['name_lst']
     for word in name_lst:
         dh = dh.append({'key':k, 'canonicalName': word}, ignore_index=True)
-
-
-df_canonicalName = None
-vectorizer_canonicalName = None
-def search_canonicalName(sentence):
-    global df_canonicalName
-    global vectorizer_canonicalName
+        
+        
+def df_generate(df, rank, columns_lst, output_file):
+    df_family = df[df['rank']==rank]
+    df_family = df_family[columns_lst]  
+    df_family.reset_index(drop=True, inplace=True)
+    df_family.to_csv(output_file, sep=';')
+    print('df ', rank, ' generate:', output_file)
+    print(df_family.shape, list(df_family.columns))
+    print(df_family.head())
+    return df_family
     
-def read_gbif_extract_csv(file_name='../data/gbif_extract.csv',\
-                          important_cols=['key', 'canonicalName'],\
-                          output_file='../data/gbif_extract_canonicalName_short.csv'):
+    
+def read_gbif_extract_csvCategorical(file_name='../data/gbif_extract.csv'):
     ''' load gbif csv data base '''
-    global df_canonicalName
-    global vectorizer_canonicalName
+    ''' output csv files with short names and key '''
     
+    output_file_family = '../data/gbif_extract_family.csv'
+    output_file_genus = '../data/gbif_extract_genus.csv'
+    output_file_species = '../data/gbif_extract_species.csv'
+    output_file_categories = '../data/gbif_extract_categories.csv'
+                
+    important_cols = ['speciesKey', 'canonicalName', 'family', 'familyKey', 'genus', 'genusKey', 'rank']
     df = pd.read_csv(file_name)
     print(df.shape, list(df.columns))    
+    print('-important columns:')
     df = df[important_cols]    
+    print(df.shape, list(df.columns))    
+
+    for c in list(df.columns):
+        if c.find("Key")==-1:
+            df[c] = df[c].apply(str).str.lower()
+            
+    print('rank list:', df['rank'].unique())
+    
+    df_family = df_generate(df, 'family', ['familyKey', 'family', 'rank'], output_file_family)
+    df_genus = df_generate(df, 'genus', ['genusKey', 'genus', 'rank'], output_file_genus)
+    
+    df_species = df[(df['rank']=='species') | (df['rank']=='subspecies')]
+    df_species.reset_index(drop=True, inplace=True)
+ 
+    print('df_species', df_species.shape)
+    print(df_species.head())
+    df_species.to_csv(output_file_species, sep=';')
+    print('df ', 'species and subspecies', ' generate:', output_file_species)
+    
+    print('Categorical <=> concat family + genus + species names list')
+    df_cat_columns = ['key', 'name', 'rank']
+    # concat family + genus + species
+    df_cat = df_family
+    df_cat.columns = df_cat_columns
+    df_genus.columns = df_cat_columns
+    df_species = df_species[['speciesKey', 'canonicalName', 'rank']]
+    df_species.columns = df_cat_columns
+    dg = pd.concat([df_cat, df_genus, df_species])
+    
+    dg.reset_index(drop=True, inplace=True)
+    print('df_cat', dg.shape)
+    print('df ', 'categories = [family+genus+species]', ' generate:', output_file_categories)
+    return dg
+    
+def read_gbif_extract_csv(file_name='../data/gbif_extract.csv',\
+                          output_file='../data/gbif_extract_canonicalName_short.csv'):
+    ''' load gbif csv data base '''
+    ''' output csv files with short names and key '''
+    ''' used to detect canonical names '''
+    ''' see "search_canonicalName()" function in scispacy_lib.py module '''
+    
+    important_cols = ['key', 'canonicalName']
+    df = pd.read_csv(file_name)
+    print(df.shape, list(df.columns))    
+    
+    print('-important columns:')
+    df = df[important_cols]    
+    print(df.shape, list(df.columns))    
+    
     # print(df.head(10))
     for c in list(df.columns):
         if c.find("Key")==-1:
@@ -139,6 +197,7 @@ def read_gbif_extract_csv(file_name='../data/gbif_extract.csv',\
     print('End file generated:', output_file)
     
     if False:
+        # following code just produced an out of memory
         text = df['canonicalName'].values    
         # create the transform
         vectorizer_canonicalName = CountVectorizer()
@@ -154,6 +213,7 @@ def read_gbif_extract_csv(file_name='../data/gbif_extract.csv',\
             i += 1
             if i>10:
                 break
+            
         # encode document*
         text = 'psygmatocerus guianensis'
         vector = vectorizer.transform([text])  
@@ -171,13 +231,7 @@ def read_gbif_extract_csv(file_name='../data/gbif_extract.csv',\
         n_patterns = len(dataX)
         print ("Total Patterns: ", n_patterns)
     
-        # define the LSTM model
-        model = Sequential()
-        model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2])))
-        model.add(Dropout(0.2))
-        model.add(Dense(y.shape[1], activation='softmax'))
-        model.compile(loss='categorical_crossentropy', optimizer='adam')            
-    
+   
     
     
 def get_gz_tab_files(path):
