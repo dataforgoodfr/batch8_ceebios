@@ -13,45 +13,88 @@ import scispacy
 import spacy                                                        
 import en_core_sci_sm
 from spacy import displacy                    
-                            
+            
+import os
+import time                
 import pandas as pd
 import pprint
 pp = pprint.PrettyPrinter(2)
 
 from scispacy.abbreviation import AbbreviationDetector
 
-import time
+
+from flashtext import KeywordProcessor
+
+
+
+if False: # local desktop working
+    os.chdir('D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/base_open_source')
+    print(os.getcwd())
 
 df_canonicalName = None
 nlpbif = None
 
-def search_canonicalName(text=None, gbif_extract_file='../data/gbif_extract_canonicalName_short.csv'):
-    ''' search on gbif canonical names '''
-    global df_canonicalName, nlpbif
-    if df_canonicalName is None or text is None:
-        df_canonicalName = pd.read_csv(gbif_extract_file, sep=';')
-        print(gbif_extract_file, ', loaded', \
-              df_canonicalName.shape, list(df_canonicalName.columns))
-        print(df_canonicalName.shape)
-        nlpbif = en_core_sci_sm.load()
 
-    if text is not None and df_canonicalName is not None:
-        resp = []
+# flashtext: Span of keywords extracted
+
+def test_flashtext():
+    keyword_processor = KeywordProcessor()
+    keyword_processor.add_keyword('Big Apple', 'New York')
+    keyword_processor.add_keyword('Bay Area')
+    keywords_found = keyword_processor.extract_keywords('I love big Apple and Bay Area.', span_info=True)
+    print(keywords_found)
+
+def load_gbif_categories(gbif_extract_file='../data/gbif_extract_categories.csv'):
+    ''' load gbif categies dataset '''
+    ''' input: csv file name '''
+    ''' ourput: fleshtext keyword_processor '''
+    
+    df_canonicalName = pd.read_csv(gbif_extract_file, sep=';')
+    print(gbif_extract_file, ', loaded', \
+          df_canonicalName.shape, list(df_canonicalName.columns))
+    kwords = list(df_canonicalName['name'].values)
+    keyword_processor = KeywordProcessor()
+    for k in kwords:        
+        tab = k.split(' ')
+        for y in tab:
+            if len(y)>0:
+                keyword_processor.add_keyword(y)        
+    print('len(keyword_processor):', len(keyword_processor))
+    
+    # ['family' 'genus' 'species' 'subspecies']
+    print(df_canonicalName['rank'].unique())    
+    return keyword_processor
+    
+keyprocessor = None
+nlpbif = None
+def search_canonicalNameFlesh(text=None):
+    global keyprocessor
+    global nlpbif
+    
+    resp = []
+    if keyprocessor is None or text is None:
+        keyprocessor = load_gbif_categories()
+        nlpbif = en_core_sci_sm.load()
+        print('- Keyprocessor and nlp, loaded')
+
+    if text is not None:
         doc = nlpbif(text)
         print("nb entities:", len(doc.ents))
+        data = []
         for x in doc.ents:
-            # print(x)
-            tabw = str(x).lower().split(' ')
-            for w in tabw:
-                print(x, '-', w)
-                df = df_canonicalName[df_canonicalName['canonicalName_word']==w]      
-                # print(df)
-                if len(df)>0:
-                    resp.append({'name':w, 'key':df['tab_key'].values[0]})
-        return resp
-    return
+            x = str(x).lower()
+            tab = x.split(' ')
+            for y in tab:
+                if len(y)>0:
+                    data.append(y)
+        keywords_found = keyprocessor.extract_keywords(' '.join(data), span_info=True)
+        if (len(keywords_found))>0:
+            for k in keywords_found: # ('pterocladiophilaceae', 735, 755)]
+                if k[0] not in resp:                
+                    resp.append(k[0])            
+    return resp
 
-def test_search_canonicalName():                   
+def test_search_canonicalNameFlesh():                   
     text = "Distribution and movement patterns of Antarctic blue whales Balaenoptera \
         musculus intermedia at large temporal and spatial scales are still \
         poorly understood. The objective of this study was \
@@ -84,11 +127,45 @@ def test_search_canonicalName():
         migration routes and destinations, as well as variable \
         timing of migration to and from the feeding grounds."
 
+    print('Test1, with first load:')
     ts = time.time()
-    resp = search_canonicalName(text)
-    pp = pprint.PrettyPrinter(2)
+    text = text.replace('whales', ' pterocladiophilaceae')
+    resp = search_canonicalNameFlesh(text)
     print('response time:', time.time()-ts)
     print(resp)
+    
+    print('Test2, same initial load already made:')
+    ts = time.time()
+    resp = search_canonicalNameFlesh(text)
+    print('response time:', time.time()-ts)
+    print(resp)
+                      
+def search_canonicalName(text=None, gbif_extract_file='../data/gbif_extract_canonicalName_short.csv'):
+    ''' search on gbif canonical names '''
+    global df_canonicalName, nlpbif
+    if df_canonicalName is None or text is None:
+        df_canonicalName = pd.read_csv(gbif_extract_file, sep=';')
+        print(gbif_extract_file, ', loaded', \
+              df_canonicalName.shape, list(df_canonicalName.columns))
+        print(df_canonicalName.shape)
+        nlpbif = en_core_sci_sm.load()
+
+    if text is not None and df_canonicalName is not None:
+        resp = []
+        doc = nlpbif(text)
+        print("nb entities:", len(doc.ents))
+        for x in doc.ents:
+            # print(x)
+            tabw = str(x).lower().split(' ')
+            for w in tabw:
+                print(x, '-', w)
+                df = df_canonicalName[df_canonicalName['canonicalName_word']==w]      
+                # print(df)
+                if len(df)>0:
+                    resp.append({'name':w, 'key':df['tab_key'].values[0]})
+        return resp
+    return
+    
 
 def explore__text_byScispacy(text=None):
     global pp
