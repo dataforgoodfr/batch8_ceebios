@@ -1,11 +1,11 @@
 from typing import List, Set
 
-import en_core_sci_lg
 import pandas as pd
 from flashtext import KeywordProcessor
 from langdetect import detect
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from thinc.neural import Model
 
 stop_words = set(stopwords.words("english"))
 
@@ -105,11 +105,10 @@ def keep_articles_with_species(
     return data
 
 
-def add_entities(data: pd.DataFrame) -> pd.DataFrame:
+def add_entities(data: pd.DataFrame, nlp: Model) -> pd.DataFrame:
     """
     Add to data a column `entities` which are found thanks to scispacy
     https://github.com/allenai/scispacy
     """
-    nlp = en_core_sci_lg.load()
     data["entities"] = data["paperAbstract"].map(lambda x: nlp(x).ents)
     return data
