@@ -1,0 +1,18 @@
+version: '3.7'
+
+services:
+  # db:
+  #   image: mongo
+  #   env_file:
+  #     - .env
+  api:
+    build: ./
+      # dockerfile: Dockerfile
+      # context: ./
+    # network_mode: host
+    # depends_on:
+    #   - db
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
