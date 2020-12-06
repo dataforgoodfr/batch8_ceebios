@@ -71,6 +71,14 @@ def keep_english_titles(df: pd.DataFrame) -> pd.DataFrame:
     return df[df.index.isin(keep_indexes)]
 
 
+def keep_english_titles2(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Keep only papers with title in english.
+    """
+    where = df["title"].map(detect).astype(str) == "en"
+    return df[where].reset_index(drop=True)
+
+
 def remove_stopwords_from_title_abstract(
     data: pd.DataFrame, list_stopwords: Set
 ) -> pd.DataFrame:
