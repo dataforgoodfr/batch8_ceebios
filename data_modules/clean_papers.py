@@ -60,7 +60,6 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
     data = remove_stopwords_from_title_abstract(data, list_stopwords)
     data = keep_articles_with_species(data, loader.keyword_processor)
     data = add_entities(data, loader.nlp)
-    # data.to_csv(f"/Volumes/Extreme SSD/ceebios/{file[:-3]}.csv", index=False)
     data.to_json(f"/Volumes/Extreme SSD/ceebios/{file[:-3]}.json", default_handler=str)
     print(f"{file[:-3]} DONE")
 
