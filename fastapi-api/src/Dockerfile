@@ -5,7 +5,7 @@ RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 WORKDIR /src/
-COPY ./src /src
+COPY . /src
 
 # ENV PYTHONPATH=$PWD
 

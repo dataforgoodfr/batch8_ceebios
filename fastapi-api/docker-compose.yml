@@ -1,18 +1,27 @@
 version: '3.7'
 
 services:
-  # db:
-  #   image: mongo
-  #   env_file:
-  #     - .env
+  db:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    # volumes:
+    #   - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
+    #   - ./mongo-volume:/data/db
+    # environment: 
+    #   - MONGO_INITDB_DATABASE=${DATABASE_NAME}
+    #   - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
+    #   - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
+    restart: always
   api:
-    build: ./
-      # dockerfile: Dockerfile
-      # context: ./
-    # network_mode: host
-    # depends_on:
-    #   - db
+    build: src/
+    env_file:
+      - .env
+    links:
+      - db
+    depends_on:
+      - db
     environment:
       - PORT=8000
     ports:
-      - "8000:8000"
+      - "80:8000"
