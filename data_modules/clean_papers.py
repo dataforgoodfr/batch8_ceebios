@@ -2,6 +2,7 @@ import gzip
 import io
 import json
 import os
+import time
 
 import en_core_sci_lg
 import pandas as pd
@@ -35,7 +36,7 @@ class Loader:
             "year",
             "fieldsOfStudy",
             "journalName",
-            "doiUrl"
+            "doiUrl",
         ]
         self.keyword_processor = get_gbif_keyprocessor(self.gbif_source_path)
         self.nlp = en_core_sci_lg.load()
@@ -60,7 +61,11 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
     data = remove_stopwords_from_title_abstract(data, list_stopwords)
     data = keep_articles_with_species(data, loader.keyword_processor)
     data = add_entities(data, loader.nlp)
-    data.to_json(f"/Volumes/Extreme SSD/ceebios/{file[:-3]}.json", default_handler=str)
+    data.to_json(
+        f"/Volumes/Extreme SSD/ceebios/{file[:-3]}.json",
+        orient="records",
+        default_handler=str,
+    )
     print(f"{file[:-3]} DONE")
 
 
