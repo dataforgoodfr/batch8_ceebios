@@ -16,20 +16,29 @@ async def read_documents(skip: int = 0, limit: int = 10):
     return species
 
 
+@router.get("/species/search/{query}", response_model=List[schemas.Specy])
+async def text_search_species(query: str):
+    species = []
+    cursor = db.species.find({"$text": {"$search": query}})
+    for specy in await cursor.to_list(length=100):
+        species.append(specy)
+    return species
+
+
 @router.get("/specy/{gbif_id}", response_model=schemas.Specy)
 async def read_specy(gbif_id: int):
     specy = await db.species.find_one({"gbif_id": gbif_id})
     if specy:
         return specy
     else:
-        raise HTTPException(status_code=404, detail=f"specy not found")
+        raise HTTPException(status_code=404, detail="species not found")
 
 
 @router.post("/specy")
 async def create_specy(specy: schemas.Specy):
     specy_in_db = await db.species.find_one({"gbif_id": specy.gbif_id})
     if specy_in_db:
-        raise HTTPException(status_code=409, detail=f"specy already exists")
+        raise HTTPException(status_code=409, detail="species already exists")
     json_compatible_specy_data = jsonable_encoder(specy)
     await db.species.insert_one(json_compatible_specy_data)
     return specy
@@ -39,7 +48,7 @@ async def create_specy(specy: schemas.Specy):
 async def get_related_documents(gbif_id: int):
     specy = await db.species.find_one({"gbif_id": gbif_id})
     if specy is None:
-        raise HTTPException(status_code=404, detail=f"specy not found")
+        raise HTTPException(status_code=404, detail="species not found")
     cursor = db.documents.find({"related_species": gbif_id})
     related_documents = []
     for doc in await cursor.to_list(length=100):

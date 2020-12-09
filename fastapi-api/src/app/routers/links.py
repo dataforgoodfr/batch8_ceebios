@@ -6,7 +6,7 @@ from app.db.db import db
 router = APIRouter()
 
 
-@router.put("/link/{doc_id}/{gbif_id}", response_model=schemas.Document)
+@router.put("/add_reference/{doc_id}/{gbif_id}", response_model=schemas.Document)
 async def link_document_to_specy(gbif_id: int, doc_id: int):
     document = await db.documents.find_one({"doc_id": doc_id})
     if document is None:
@@ -26,4 +26,4 @@ async def link_document_to_specy(gbif_id: int, doc_id: int):
         )
         return document
     else:
-        raise HTTPException(status_code=404, detail=f"reference already exists")
+        raise HTTPException(status_code=404, detail="reference already exists")

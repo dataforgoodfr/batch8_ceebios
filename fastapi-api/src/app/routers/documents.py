@@ -17,6 +17,15 @@ async def read_documents(skip: int = 0, limit: int = 10):
     return documents
 
 
+@router.get("/documents/search/{query}", response_model=List[schemas.Document])
+async def text_search_documents(query: str):
+    documents = []
+    cursor = db.documents.find({"$text": {"$search": query}})
+    for doc in await cursor.to_list(length=100):
+        documents.append(doc)
+    return documents
+
+
 @router.get("/document/{doc_id}", response_model=schemas.Document)
 async def read_document(doc_id: int):
     document = await db.documents.find_one({"doc_id": doc_id})
@@ -30,7 +39,7 @@ async def read_document(doc_id: int):
 async def create_document(document: schemas.Document):
     document_in_db = await db.documents.find_one({"doc_id": document.doc_id})
     if document_in_db:
-        raise HTTPException(status_code=409, detail=f"document already exists")
+        raise HTTPException(status_code=409, detail="document already exists")
     json_compatible_document_data = jsonable_encoder(document)
     await db.documents.insert_one(json_compatible_document_data)
     return document
@@ -41,7 +50,6 @@ async def search_documents_by_tag(tag: str):
     documents = []
     cursor = db.documents.find({"tags": tag})
     for doc in await cursor.to_list(length=100):
-        print(doc)
         documents.append(doc)
     return documents
 

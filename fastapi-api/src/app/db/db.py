@@ -1,15 +1,10 @@
-import os
 from motor import motor_asyncio
-from dotenv import load_dotenv
-from odmantic import AIOEngine
+from app.config import settings
 
-load_dotenv()
+print(settings.DATABASE_URI)
+print(settings.DATABASE_NAME)
 
-DATABASE_URI = os.getenv("DATABASE_URI")
-DATABASE_NAME = os.getenv("DATABASE_NAME")
-
-client = motor_asyncio.AsyncIOMotorClient(DATABASE_URI)
-db = client[DATABASE_NAME]
+client = motor_asyncio.AsyncIOMotorClient(settings.DATABASE_URI)
+db = client[settings.DATABASE_NAME]
 
 # engine = AIOEngine(motor_client=client, database=DATABASE_NAME)
-

@@ -3,5 +3,5 @@ uvicorn==0.12.3
 motor==2.3.0
 pytest==6.1.2
 python-dotenv==0.15.0
-odmantic==0.3.1
 requests==2.25.0
+flake8==3.8.4
