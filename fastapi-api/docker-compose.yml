@@ -5,16 +5,15 @@ services:
     image: mongo:latest
     ports:
       - "27017:27017"
-    # volumes:
-    #   - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo-js:ro
-    #   - ./mongo-volume:/data/db
-    # environment: 
-    #   - MONGO_INITDB_DATABASE=${DATABASE_NAME}
-    #   - MONGO_INITDB_ROOT_USERNAME=${USERNAME}
-    #   - MONGO_INITDB_ROOT_PASSWORD=${PASSWORD}
+    volumes:
+      - ./mongo-volume:/data/db
+    env_file:
+      - .env
     restart: always
   api:
     build: src/
+    volumes:
+      - ./src/:/usr/src/app/
     env_file:
       - .env
     links:
