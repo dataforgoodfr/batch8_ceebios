@@ -1,8 +1,8 @@
 import os
 from pydantic import BaseSettings
-from dotenv import load_dotenv, find_dotenv
+from dotenv import load_dotenv
 
-load_dotenv(find_dotenv())
+load_dotenv("../../.env")
 
 
 class Settings(BaseSettings):
