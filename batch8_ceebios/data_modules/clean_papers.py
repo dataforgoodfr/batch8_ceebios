@@ -76,7 +76,8 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
     try:
         data = keep_english_titles(data)
     except LangDetectException:
-        return 
+        print(f"ISSUE WITH {file[:-3]}")
+        return
     data = data.drop_duplicates(subset=["doc_id", "title", "abstract"])
     data = remove_stopwords_from_title_abstract(data, list_stopwords)
     data = keep_articles_with_species(data, loader.keyword_processor)
