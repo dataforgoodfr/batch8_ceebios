@@ -160,12 +160,27 @@ def read_gbif_extract_csvCategorical(file_name="../data/gbif_extract.csv"):
 
 dg_gbif_Categorical = None
 def search_in_gbif_extract_Categorical(keyword):
+    ''' search keyword in dataset '''
+    ''' input keyword, output gbif_id, keyword, rank '''
     global dg_gbif_Categorical
     df = dg_gbif_Categorical[dg_gbif_Categorical['name']==keyword]
     if len(df)>0:
         return list(df.values[0])
     return([0, keyword, ''])
+
+dg_gbif_Categoricalx = None
+def search_in_gbif_extract_Categoricald_x(keyword):
+    ''' search with indexed column '''
+    ''' this one is faster '''
+    ''' input keyword, output gbif_id, keyword, rank '''
+    global dg_gbif_Categoricalx
     
+    df = dg_gbif_Categoricalx.loc[keyword]
+    if len(df)>0:
+        return list(df)
+    return([0, keyword, ''])
+    
+
 def read_gbif_extract_csvCategorical_test():
     global dg_gbif_Categorical
     
@@ -177,6 +192,22 @@ def read_gbif_extract_csvCategorical_test():
     dg_gbif_Categorical = dg
     keyword = 'oedicerotidae'
     print(search_in_gbif_extract_Categorical(keyword))
+    ts = time.time()
+    for i in range(0,2000):
+        keyword = 'austronecydalopsis iridipennis'
+        ret = search_in_gbif_extract_Categorical(keyword)
+    print('time:', time.time()-ts) # 11.45
+
+    print('Same loop but with index:')
+    dg_gbif_Categoricalx = dg_gbif_Categorical
+    dg_gbif_Categoricalx.index = dg_gbif_Categoricalx['name']
+    ts = time.time()
+    for i in range(0,2000):
+        keyword = 'austronecydalopsis iridipennis'
+        ret = search_in_gbif_extract_Categoricald_x(keyword)
+    print('time:', time.time()-ts) # 3.57
+        
+    
         
         
 def read_gbif_extract_csv(
