@@ -27,7 +27,7 @@ class Loader:
         self.papers_data_dir = (
             "/Users/chloesekkat/Documents/batch8_ceebios/data_open_source"
         )
-
+        self.categories_data_dir = "categories_id.csv"
         self.to_keep = [
             "id",
             "title",
@@ -37,8 +37,10 @@ class Loader:
             "fieldsOfStudy",
             "journalName",
             "doiUrl",
+            "doi",
         ]
         self.keyword_processor = get_gbif_keyprocessor(self.gbif_source_path)
+        self.categories_ids = pd.read_csv(self.categories_data_dir)
         self.nlp = en_core_sci_lg.load()
 
 
@@ -53,13 +55,25 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
         json_list.append(json.loads(line))
     gz.close()
     data = pd.DataFrame(json_list)
-    data = remove_empty_abstract(data)
+    data = keep_english_titles(data)
     data = keep_columns(data, loader.to_keep)
     data["year"] = data["year"].fillna(0)
     data["year"] = data["year"].astype(int)
+    data = data.rename(
+        columns={
+            "id": "doc_id",
+            "paperAbstract": "abstract",
+            "year": "publication_year",
+            "journalName": "publisher",
+            "fieldsOfStudy": "scientific_fields",
+            "doiUrl": "url",
+        }
+    )
     data = keep_english_titles(data)
+    data = data.drop_duplicates(subset=["doc_id", "title", "abstract"])
     data = remove_stopwords_from_title_abstract(data, list_stopwords)
     data = keep_articles_with_species(data, loader.keyword_processor)
+    data = add_all_ids_to_species(data, loader.categories_ids)
     data = add_entities(data, loader.nlp)
     data.to_json(
         f"/Volumes/Extreme SSD/ceebios/{file[:-3]}.json",

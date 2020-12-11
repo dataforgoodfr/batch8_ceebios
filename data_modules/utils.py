@@ -16,6 +16,12 @@ own_list = set(
         "data",
         "idea",
         "may",
+        "america",
+        "robert",
+        "taiwan",
+        "canada",
+        "gordon",
+        "major",
     ]
 )
 
@@ -40,14 +46,6 @@ def get_gbif_keyprocessor(source_path: str) -> KeywordProcessor:
     return keyword_processor
 
 
-def remove_empty_abstract(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Remove rows where paper abstract is an empty string.
-    """
-    where = df["paperAbstract"].values != ""
-    return df[where]
-
-
 def keep_columns(df: pd.DataFrame, cols_to_keep: List[str]) -> pd.DataFrame:
     """
     Return dataframe with wanted columns.
@@ -56,22 +54,6 @@ def keep_columns(df: pd.DataFrame, cols_to_keep: List[str]) -> pd.DataFrame:
 
 
 def keep_english_titles(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Keep only papers with title in english.
-    """
-    keep_indexes = []  # get lits of indexes that we will keep
-    df = df.reset_index(drop=True)
-    for i, element in enumerate(df["title"]):
-        try:
-            res = detect(element)
-            if res == "en":
-                keep_indexes.append(i)
-        except:
-            continue
-    return df[df.index.isin(keep_indexes)]
-
-
-def keep_english_titles2(df: pd.DataFrame) -> pd.DataFrame:
     """
     Keep only papers with title in english.
     """
@@ -86,7 +68,7 @@ def remove_stopwords_from_title_abstract(
     Remove all stopwords from title and abstract in order to prevent many false positive.
     """
     data = data.reset_index(drop=True)
-    data["full"] = data["title"] + " " + data["paperAbstract"]
+    data["full"] = data["title"] + " " + data["abstract"]
     data["full"] = data["full"].str.lower()
     data["full"] = data["full"].map(lambda x: word_tokenize(x))
     data["full"] = data["full"].map(
@@ -118,5 +100,39 @@ def add_entities(data: pd.DataFrame, nlp: Model) -> pd.DataFrame:
     Add to data a column `entities` which are found thanks to scispacy
     https://github.com/allenai/scispacy
     """
-    data["entities"] = data["paperAbstract"].map(lambda x: nlp(x).ents)
+    data["tags"] = data["abstract"].map(lambda x: nlp(x).ents)
     return data
+
+
+def add_all_ids_to_species(data: pd.DataFrame, cat_data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add all necessaries ids to match documents with gbif_id, canonical_name, rank.
+    """
+    df_join = pd.merge(
+        data.explode("keyword"),
+        cat_data,
+        left_on="keyword",
+        right_on="canonicalName",
+        how="inner",
+    )
+    df_join["dict_species"] = df_join.apply(
+        lambda row: {
+            "gbif_id": row["taxonID"],
+            "canonical_name": row["canonicalName"],
+            "rank": row["taxonRank"],
+        },
+        axis=1,
+    )
+    df_tmp = (
+        df_join.groupby(["doc_id", "title", "abstract"])
+        .agg({"dict_species": lambda x: list(x)})
+        .reset_index()
+    )
+    df_join = df_join.drop(
+        ["keyword", "taxonID", "canonicalName", "taxonRank", "dict_species"], axis=1
+    )
+    df_join = df_join.drop_duplicates(subset=["doc_id", "title", "abstract"])
+    df_final = pd.merge(
+        df_join, df_tmp, on=["doc_id", "title", "abstract"], how="inner"
+    )
+    return df_final
