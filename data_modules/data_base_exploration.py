@@ -158,7 +158,27 @@ def read_gbif_extract_csvCategorical(file_name="../data/gbif_extract.csv"):
     )
     return dg
 
-
+dg_gbif_Categorical = None
+def search_in_gbif_extract_Categorical(keyword):
+    global dg_gbif_Categorical
+    df = dg_gbif_Categorical[dg_gbif_Categorical['name']==keyword]
+    if len(df)>0:
+        return list(df.values[0])
+    return([0, keyword, ''])
+    
+def read_gbif_extract_csvCategorical_test():
+    global dg_gbif_Categorical
+    
+    file_categories = "../data/gbif_extract_categories.csv"
+    
+    dg = pd.read_csv(file_categories, names=['key', 'name', 'rank'], sep=';')
+    print(dg.shape, dg.columns)
+    print(dg.head())
+    dg_gbif_Categorical = dg
+    keyword = 'oedicerotidae'
+    print(search_in_gbif_extract_Categorical(keyword))
+        
+        
 def read_gbif_extract_csv(
     file_name="../data/gbif_extract.csv",
     output_file="../data/gbif_extract_canonicalName_short.csv",
