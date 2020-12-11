@@ -16,9 +16,7 @@ Created on Sat Nov 21 16:35:50 2020
 # D:\ecomdataforgoodfr\Ceebios\base_open_source
 
 
-import os
 import glob
-import json
 import getopt
 
 import gzip
@@ -31,7 +29,6 @@ import pprint
 
 pp = pprint.PrettyPrinter(2)
 import json
-import re
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 
@@ -45,7 +42,7 @@ if False:  # local desktop working
     os.chdir("D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/base_open_source")
     print(os.getcwd())
 
-from scispacy_lib import explore__text_byScispacy
+from batch8_ceebios.scispacy_lib import explore__text_byScispacy
 
 
 def read_parameters(argv):
@@ -96,10 +93,10 @@ def read_gbif_extract_csvCategorical(file_name="../data/gbif_extract.csv"):
     """ load gbif csv data base """
     """ output csv files with short names and key """
 
-    output_file_family = "../data/gbif_extract_family.csv"
-    output_file_genus = "../data/gbif_extract_genus.csv"
-    output_file_species = "../data/gbif_extract_species.csv"
-    output_file_categories = "../data/gbif_extract_categories.csv"
+    output_file_family = "../../data/gbif_extract_family.csv"
+    output_file_genus = "../../data/gbif_extract_genus.csv"
+    output_file_species = "../../data/gbif_extract_species.csv"
+    output_file_categories = "../../data/gbif_extract_categories.csv"
 
     important_cols = [
         "speciesKey",
@@ -186,7 +183,7 @@ def search_in_gbif_extract_Categoricald_x(keyword):
 def read_gbif_extract_csvCategorical_test():
     global dg_gbif_Categorical
     
-    file_categories = "../data/gbif_extract_categories.csv"
+    file_categories = "../../data/gbif_extract_categories.csv"
     
     dg = pd.read_csv(file_categories, names=['key', 'name', 'rank'], sep=';')
     print(dg.shape, dg.columns)

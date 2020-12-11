@@ -53,6 +53,14 @@ def keep_columns(df: pd.DataFrame, cols_to_keep: List[str]) -> pd.DataFrame:
     return df[cols_to_keep]
 
 
+def remove_empty_abstract(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Remove rows where paper abstract is an empty string.
+    """
+    where = df["paperAbstract"].values != ""
+    return df[where]
+
+
 def keep_english_titles(df: pd.DataFrame) -> pd.DataFrame:
     """
     Keep only papers with title in english.

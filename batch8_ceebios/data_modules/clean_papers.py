@@ -2,12 +2,11 @@ import gzip
 import io
 import json
 import os
-import time
 
 import en_core_sci_lg
 import pandas as pd
 
-from data_modules.utils import (
+from .utils import (
     get_gbif_keyprocessor,
     remove_empty_abstract,
     keep_columns,
@@ -16,6 +15,7 @@ from data_modules.utils import (
     keep_articles_with_species,
     add_entities,
     list_stopwords,
+    add_all_ids_to_species
 )
 
 
@@ -27,7 +27,9 @@ class Loader:
         self.papers_data_dir = (
             "/Users/chloesekkat/Documents/batch8_ceebios/data_open_source"
         )
-        self.categories_data_dir = "categories_id.csv"
+        self.categories_data_dir = (
+            "/Users/chloesekkat/Documents/batch8_ceebios/data/categories_id.csv"
+        )
         self.to_keep = [
             "id",
             "title",
@@ -57,6 +59,7 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
     data = pd.DataFrame(json_list)
     data = keep_english_titles(data)
     data = keep_columns(data, loader.to_keep)
+    data = remove_empty_abstract(data)
     data["year"] = data["year"].fillna(0)
     data["year"] = data["year"].astype(int)
     data = data.rename(
@@ -89,6 +92,3 @@ def main():
         if file.endswith(".gz"):
             clean_gz_to_csv(loader.papers_data_dir, file, loader)
 
-
-if __name__ == "__main__":
-    main()
