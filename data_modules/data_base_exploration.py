@@ -175,9 +175,11 @@ def search_in_gbif_extract_Categoricald_x(keyword):
     ''' input keyword, output gbif_id, keyword, rank '''
     global dg_gbif_Categoricalx
     
-    df = dg_gbif_Categoricalx.loc[keyword]
-    if len(df)>0:
+    try:
+        df = dg_gbif_Categoricalx.loc[keyword]
         return list(df)
+    except:
+        pass
     return([0, keyword, ''])
     
 
@@ -198,7 +200,7 @@ def read_gbif_extract_csvCategorical_test():
         ret = search_in_gbif_extract_Categorical(keyword)
     print('time:', time.time()-ts) # 11.45
 
-    print('Same loop but with index:')
+    print('Same loop but with index:(work if key does exist)')
     dg_gbif_Categoricalx = dg_gbif_Categorical
     dg_gbif_Categoricalx.index = dg_gbif_Categoricalx['name']
     ts = time.time()
