@@ -1,7 +1,11 @@
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, validator
 from datetime import datetime
 from bson import ObjectId
+
+
+def normalize(name: str) -> str:
+    return " ".join(name.split(" "))
 
 
 class Specy(BaseModel):
@@ -19,6 +23,11 @@ class Specy(BaseModel):
     taxonimic_class: str = Field(..., example="Mammalia", alias="class")
     phylum: str = Field(..., example="Chordata")
     kingdom: str = Field(..., example="Animalia")
+
+    @validator("scientific_name")
+    def normalize_name(cls, v):
+        assert v != "", "Empty strings are not allowed."
+        return normalize(v)
 
     # references
     # related_documents: Optional[List[int]] = None

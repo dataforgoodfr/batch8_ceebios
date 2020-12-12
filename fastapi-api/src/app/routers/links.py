@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.encoders import jsonable_encoder
 from app import schemas
 from app.db.db import db
 
@@ -13,16 +12,16 @@ async def link_document_to_specy(gbif_id: int, doc_id: int):
         raise HTTPException(
             status_code=404, detail=f"document id:{doc_id} does not exists"
         )
-    specy = await db.species.find_one({"gbif_id": gbif_id})
-    if specy is None:
+    taxon = await db.taxons.find_one({"gbif_id": gbif_id}, {"_id": False})
+    if taxon is None:
         raise HTTPException(
             status_code=404, detail=f"specy id:{gbif_id} does not exists"
         )
-    if gbif_id not in document["related_species"]:
-        document["related_species"] += [gbif_id]
-        db.document.update_one(
+    if taxon not in document["related_taxons"]:
+        document["related_taxons"] += [taxon]
+        await db.documents.update_one(
             {"doc_id": doc_id},
-            {"$set": {"related_species": document["related_species"]}},
+            {"$set": {"related_taxons": document["related_taxons"]}},
         )
         return document
     else:

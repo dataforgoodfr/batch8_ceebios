@@ -2,23 +2,29 @@ from typing import List, Optional, Dict
 from pydantic import BaseModel, Field
 from datetime import datetime
 from bson import ObjectId
+from .taxon import Taxon
+
+
+class Author(BaseModel):
+    name: str = Field(..., example="Kyle K Dickinson")
+    ids: List[str] = Field(..., example=["88764984"])
 
 
 class Document(BaseModel):
     _id: ObjectId
+    _inserted_at: datetime = Field(default_factory=datetime.utcnow)
     doc_id: int
     doi: str
     title: str
     abstract: str
     publication_year: Optional[int] = None
-    _inserted_at: datetime = Field(default_factory=datetime.utcnow)
-    publisher: Optional[str] = []
+    publisher: Optional[str] = None
     url: Optional[str] = None
     scientific_fields: Optional[List[str]] = []
     tags: Optional[List[str]] = []
-    authors: Optional[List[str]] = []
-    content: Dict
-    related_species: Optional[List[int]] = []
+    authors: Optional[List[Author]] = []
+    _content: Dict
+    related_taxons: List[Taxon] = []
 
     class Config:
         schema_extra = {
@@ -33,15 +39,12 @@ class Document(BaseModel):
                 "scientific_fields": ["Medecine", "Biology"],
                 "tags": ["string"],
                 "authors": [
-                    "Flora Alfano",
-                    "Giulia Dowgier",
-                    "Maria Paola Valentino",
-                    "Giorgio Galiero",
-                    "Antonella Tinelli",
-                    "Decaro Nicola",
-                    "Giovanna Fusco",
+                    {"name": "Kyle K Dickinson", "ids": ["88764984"]},
+                    {"name": "Leah C Hammond", "ids": ["39777352"]},
+                    {"name": "Courtney M Karner", "ids": ["4880657"]},
                 ],
-                "content": {},
-                "related_species": [0],
+                "related_taxons": [
+                    {"gbif_id": 1, "rank": "class", "canonical_name": "test"}
+                ],
             }
         }

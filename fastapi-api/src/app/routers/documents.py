@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from app import schemas
 from typing import List
 from app.db.db import db
+
 
 router = APIRouter()
 
@@ -20,7 +21,9 @@ async def read_documents(skip: int = 0, limit: int = 10):
 @router.get("/documents/search/{query}", response_model=List[schemas.Document])
 async def text_search_documents(query: str):
     documents = []
-    cursor = db.documents.find({"$text": {"$search": query}})
+    cursor = db.documents.find({"$text": {"$search": query}}).collation(
+        {"locale": "en", "strength": 2}
+    )
     for doc in await cursor.to_list(length=100):
         documents.append(doc)
     return documents
@@ -42,13 +45,21 @@ async def create_document(document: schemas.Document):
         raise HTTPException(status_code=409, detail="document already exists")
     json_compatible_document_data = jsonable_encoder(document)
     await db.documents.insert_one(json_compatible_document_data)
+    related_taxons = document.related_taxons
+    # upsert related taxons documents in the taxon collection
+    if related_taxons:
+        for taxon in related_taxons:
+            json_taxon = jsonable_encoder(taxon)
+            await db.taxons.update_one(
+                {"gbif_id": taxon.gbif_id}, {"$set": json_taxon}, upsert=True
+            )
     return document
 
 
 @router.get("/document/tag/{tag}", response_model=List[schemas.Document])
 async def search_documents_by_tag(tag: str):
     documents = []
-    cursor = db.documents.find({"tags": tag})
+    cursor = db.documents.find({"$or": [{"tags": tag}, {"scientific_fields": tag}]})
     for doc in await cursor.to_list(length=100):
         documents.append(doc)
     return documents

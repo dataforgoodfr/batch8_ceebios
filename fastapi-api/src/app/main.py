@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import documents, species, links
+from app.routers import documents, links, taxons
 from app.config import settings
 from app.db.init_db import init_db
 from app.db import db
@@ -8,14 +8,22 @@ tags_metadata = [
     {
         "name": "documents",
         "description": "Operations with documents",
+        "externalDocs": {
+            "description": "original data",
+            "url": "https://www.semanticscholar.org/",
+        },
     },
     {
-        "name": "species",
-        "description": "Operations with species",
+        "name": "taxons",
+        "description": "Operations with taxons",
         "externalDocs": {
             "description": "original data",
             "url": "https://www.gbif.org/developer/species",
         },
+    },
+    {
+        "name": "references",
+        "description": "Link a document to a taxon",
     },
 ]
 app = FastAPI(
@@ -33,12 +41,12 @@ async def startup():
 
 @app.on_event("shutdown")
 async def shutdown():
-    db.close()
+    await db.close()
 
 
 app.include_router(documents.router, tags=["documents"])
-app.include_router(species.router, tags=["species"])
 app.include_router(links.router, tags=["references"])
+app.include_router(taxons.router, tags=["taxons"])
 
 
 @app.get("/")
