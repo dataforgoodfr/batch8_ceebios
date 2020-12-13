@@ -60,6 +60,7 @@ def remove_empty_abstract(df: pd.DataFrame) -> pd.DataFrame:
     where = df["paperAbstract"].values != ""
     return df[where]
 
+
 def remove_empty_titles(df: pd.DataFrame) -> pd.DataFrame:
     """
     Remove rows where title is an empty string.

@@ -16,7 +16,7 @@ from .utils import (
     keep_articles_with_species,
     add_entities,
     list_stopwords,
-    add_all_ids_to_species, remove_empty_titles
+    add_all_ids_to_species,
 )
 
 
@@ -25,9 +25,7 @@ class Loader:
         self.gbif_source_path = (
             "/Users/chloesekkat/Documents/batch8_ceebios/data/simplified_taxon_gbif.csv"
         )
-        self.papers_data_dir = (
-            "/Volumes/Extreme SSD/open_data_ceebios"
-        )
+        self.papers_data_dir = "/Volumes/Extreme SSD/open_data_ceebios"
         self.categories_data_dir = (
             "/Users/chloesekkat/Documents/batch8_ceebios/data/categories_id.csv"
         )
@@ -59,7 +57,7 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
     gz.close()
     data = pd.DataFrame(json_list)
     data = keep_columns(data, loader.to_keep)
-    #data = remove_empty_titles(data)
+    # data = remove_empty_titles(data)
     data = remove_empty_abstract(data)
     data["year"] = data["year"].fillna(0)
     data["year"] = data["year"].astype(int)
@@ -96,4 +94,3 @@ def main():
     for file in os.listdir(loader.papers_data_dir):
         if file.endswith(".gz"):
             clean_gz_to_csv(loader.papers_data_dir, file, loader)
-

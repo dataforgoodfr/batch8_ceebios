@@ -1,8 +1,9 @@
-from typing import Optional
-from enum import Enum
-from pydantic import BaseModel, Field
 from datetime import datetime
+from enum import Enum
+from typing import Optional
+
 from bson import ObjectId
+from pydantic import BaseModel, Field
 
 
 class RankEnum(str, Enum):

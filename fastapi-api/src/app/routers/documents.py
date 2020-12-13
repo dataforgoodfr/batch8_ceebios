@@ -1,10 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder
-from app import schemas
 from typing import List
-from app.db.db import db
 
+from app import schemas
+from app.db.db import db
+from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 
 router = APIRouter()
 

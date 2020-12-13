@@ -1,8 +1,8 @@
-from fastapi import FastAPI
-from app.routers import documents, links, taxons
 from app.config import settings
-from app.db.init_db import init_db
 from app.db import db
+from app.db.init_db import init_db
+from app.routers import documents, links, taxons
+from fastapi import FastAPI
 
 tags_metadata = [
     {

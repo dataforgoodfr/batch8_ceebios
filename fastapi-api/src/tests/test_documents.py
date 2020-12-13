@@ -1,6 +1,6 @@
 import pytest
-from fastapi.testclient import TestClient
 from app.routers import documents
+from fastapi.testclient import TestClient
 
 TEST_JSON = {
     "doc_id": 12,

@@ -12,20 +12,16 @@ Created on Sat Nov 21 16:35:50 2020
 @author: CHRISTIAN
 """
 
-
 # D:\ecomdataforgoodfr\Ceebios\base_open_source
 
 
-import glob
 import getopt
-
+import glob
 import gzip
 import io
-
 import ntpath
-
-import time
 import pprint
+import time
 
 pp = pprint.PrettyPrinter(2)
 import json
@@ -36,7 +32,6 @@ pd.set_option("display.max_rows", 500)
 pd.set_option("display.max_columns", 500)
 pd.set_option("display.width", 1000)
 pd.set_option("max_colwidth", 1000)
-
 
 if False:  # local desktop working
     os.chdir("D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/base_open_source")
@@ -93,10 +88,10 @@ def read_gbif_extract_csvCategorical(file_name="../data/gbif_extract.csv"):
     """ load gbif csv data base """
     """ output csv files with short names and key """
 
-    output_file_family = "../../data/gbif_extract_family.csv"
-    output_file_genus = "../../data/gbif_extract_genus.csv"
-    output_file_species = "../../data/gbif_extract_species.csv"
-    output_file_categories = "../../data/gbif_extract_categories.csv"
+    output_file_family = "../../data/gbif_extract/gbif_extract_family.csv"
+    output_file_genus = "../../data/gbif_extract/gbif_extract_genus.csv"
+    output_file_species = "../../data/gbif_extract/gbif_extract_species.csv"
+    output_file_categories = "../../data/gbif_extract/gbif_extract_categories.csv"
 
     important_cols = [
         "speciesKey",
@@ -155,60 +150,64 @@ def read_gbif_extract_csvCategorical(file_name="../data/gbif_extract.csv"):
     )
     return dg
 
+
 dg_gbif_Categorical = None
+
+
 def search_in_gbif_extract_Categorical(keyword):
-    ''' search keyword in dataset '''
-    ''' input keyword, output gbif_id, keyword, rank '''
+    """ search keyword in dataset """
+    """ input keyword, output gbif_id, keyword, rank """
     global dg_gbif_Categorical
-    df = dg_gbif_Categorical[dg_gbif_Categorical['name']==keyword]
-    if len(df)>0:
+    df = dg_gbif_Categorical[dg_gbif_Categorical["name"] == keyword]
+    if len(df) > 0:
         return list(df.values[0])
-    return([0, keyword, ''])
+    return [0, keyword, ""]
+
 
 dg_gbif_Categoricalx = None
+
+
 def search_in_gbif_extract_Categoricald_x(keyword):
-    ''' search with indexed column '''
-    ''' this one is faster '''
-    ''' input keyword, output gbif_id, keyword, rank '''
+    """ search with indexed column """
+    """ this one is faster """
+    """ input keyword, output gbif_id, keyword, rank """
     global dg_gbif_Categoricalx
-    
+
     try:
         df = dg_gbif_Categoricalx.loc[keyword]
         return list(df)
     except:
         pass
-    return([0, keyword, ''])
-    
+    return [0, keyword, ""]
+
 
 def read_gbif_extract_csvCategorical_test():
     global dg_gbif_Categorical
-    
-    file_categories = "../../data/gbif_extract_categories.csv"
-    
-    dg = pd.read_csv(file_categories, names=['key', 'name', 'rank'], sep=';')
+
+    file_categories = "../../data/gbif_extract/gbif_extract_categories.csv"
+
+    dg = pd.read_csv(file_categories, names=["key", "name", "rank"], sep=";")
     print(dg.shape, dg.columns)
     print(dg.head())
     dg_gbif_Categorical = dg
-    keyword = 'oedicerotidae'
+    keyword = "oedicerotidae"
     print(search_in_gbif_extract_Categorical(keyword))
     ts = time.time()
-    for i in range(0,2000):
-        keyword = 'austronecydalopsis iridipennis'
+    for i in range(0, 2000):
+        keyword = "austronecydalopsis iridipennis"
         ret = search_in_gbif_extract_Categorical(keyword)
-    print('time:', time.time()-ts) # 11.45
+    print("time:", time.time() - ts)  # 11.45
 
-    print('Same loop but with index:(work if key does exist)')
+    print("Same loop but with index:(work if key does exist)")
     dg_gbif_Categoricalx = dg_gbif_Categorical
-    dg_gbif_Categoricalx.index = dg_gbif_Categoricalx['name']
+    dg_gbif_Categoricalx.index = dg_gbif_Categoricalx["name"]
     ts = time.time()
-    for i in range(0,2000):
-        keyword = 'austronecydalopsis iridipennis'
+    for i in range(0, 2000):
+        keyword = "austronecydalopsis iridipennis"
         ret = search_in_gbif_extract_Categoricald_x(keyword)
-    print('time:', time.time()-ts) # 3.57
-        
-    
-        
-        
+    print("time:", time.time() - ts)  # 3.57
+
+
 def read_gbif_extract_csv(
     file_name="../data/gbif_extract.csv",
     output_file="../data/gbif_extract_canonicalName_short.csv",
