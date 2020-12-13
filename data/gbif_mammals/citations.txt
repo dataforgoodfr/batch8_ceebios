@@ -1,2 +1,0 @@
-When using this dataset please use the following citation and pay attention to the rights documented in rights.txt:
-MNHN, Chagnoux S (2020). The mammals collection (ZM) of the Muséum national d'Histoire naturelle (MNHN - Paris). Version 43.184. MNHN - Museum national d'Histoire naturelle. Occurrence dataset https://doi.org/10.15468/j0xw9i accessed via GBIF.org on 2020-09-27.

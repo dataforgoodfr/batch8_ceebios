@@ -131,6 +131,10 @@ dmypy.json
 .pyre/
 
 .idea
+.DS_Store
 
+# too heavy data files for github
+data/categories_id.csv
+data/simplified_taxon_gbif.csv
 
 *.geojson

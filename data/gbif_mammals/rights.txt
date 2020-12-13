@@ -1,3 +1,0 @@
-
-Dataset: The mammals collection (ZM) of the Muséum national d'Histoire naturelle (MNHN - Paris)
-Rights as supplied: http://creativecommons.org/licenses/by/4.0/legalcode
