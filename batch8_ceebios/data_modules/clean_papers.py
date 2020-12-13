@@ -59,7 +59,7 @@ def clean_gz_to_csv(data_dir: str, file: str, loader: Loader) -> None:
     gz.close()
     data = pd.DataFrame(json_list)
     data = keep_columns(data, loader.to_keep)
-    data = remove_empty_titles(data)
+    #data = remove_empty_titles(data)
     data = remove_empty_abstract(data)
     data["year"] = data["year"].fillna(0)
     data["year"] = data["year"].astype(int)
