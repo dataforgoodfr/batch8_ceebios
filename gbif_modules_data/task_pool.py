@@ -8,16 +8,10 @@ Created on Sat Apr 18 14:46:37 2020
 """ pool mulithreading manager
 """
 
-
-import os
-
-import sys
-import time
-import pandas as pd
-from threading import Thread
-
 import multiprocessing
 import random
+import sys
+import time
 
 
 def work_todo_example(number, tab, toexit=True):

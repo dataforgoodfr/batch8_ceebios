@@ -1,15 +1,12 @@
-import requests
-import time
-import pandas as pd
 import urllib.parse
-from tqdm import tqdm, tqdm_notebook
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from json.decoder import JSONDecodeError
 
+import requests
+from tqdm import tqdm, tqdm_notebook
 
 from .species import Species
 from .species_list import SpeciesList
-
 
 """
 TODO 
@@ -17,7 +14,6 @@ TODO
 - Wrapper with visualizations for group of species
 - Get list of values for sub hierarchies for easy search 
 """
-
 
 CHUNK_SIZE = 1000
 LIMIT = int(6.6e6)  # 6 586 578 differents species referenced on gbif.org

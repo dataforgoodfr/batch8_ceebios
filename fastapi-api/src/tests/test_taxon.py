@@ -1,6 +1,6 @@
 import pytest
-from fastapi.testclient import TestClient
 from app.routers import taxons
+from fastapi.testclient import TestClient
 
 TEST_JSON = {"gbif_id": 15, "canonical_name": "test", "rank": "class"}
 
@@ -9,7 +9,6 @@ TEST_JSON_0 = {
     "canonical_name": "Canis Lupus Familiaris",
     "rank": "subspecies",
 }
-
 
 client = TestClient(taxons.router)
 

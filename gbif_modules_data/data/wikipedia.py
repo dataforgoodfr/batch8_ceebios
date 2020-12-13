@@ -1,13 +1,13 @@
-import wikipedia
 import webbrowser
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from io import BytesIO
+
 import bs4 as bs
-import time
 import pandas as pd
 import requests
+import wikipedia
 from PIL import Image
-from io import BytesIO
 from tqdm import tqdm
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class WikipediaError(Exception):
@@ -109,7 +109,6 @@ class WikipediaExtractor:
 
 
 class WikipediaPage(wikipedia.WikipediaPage):
-
     ATTRS = [
         "categories",
         "content",

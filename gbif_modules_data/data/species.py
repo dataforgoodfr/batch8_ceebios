@@ -1,11 +1,11 @@
-import requests
 import pandas as pd
+import requests
+
+from .coreac import CoreACExtractor
+from .scholar import GoogleScholarExtractor
 
 # from .gbif import BASE_GBIF_URL
 from .wikipedia import WikipediaExtractor, WikipediaError
-from .scholar import GoogleScholarExtractor
-from .coreac import CoreACExtractor
-
 
 EXAMPLE_SPECIES = [
     "Vespa Ducalis",

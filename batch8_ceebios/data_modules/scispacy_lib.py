@@ -9,23 +9,18 @@ Created on Sat Nov 21 19:10:35 2020
 !pip install https://s3-us-west-2.amazonaws.com/ai2-s2-scispacy/releases/v0.2.4/en_core_sci_sm-0.2.4.tar.gz --user
 """
 
-import scispacy
-import spacy
-import en_core_sci_sm
-from spacy import displacy
-
-import os
-import time
-import pandas as pd
 import pprint
+import time
+
+import en_core_sci_sm
+import pandas as pd
+from spacy import displacy
 
 pp = pprint.PrettyPrinter(2)
 
 from scispacy.abbreviation import AbbreviationDetector
 
-
 from flashtext import KeywordProcessor
-
 
 if False:  # local desktop working
     os.chdir("D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/base_open_source")

@@ -1,8 +1,8 @@
 import json
 import os
 
-from pymongo import MongoClient
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 load_dotenv()
 MONGO_UNSERNAME = os.getenv("MONGO_USERNAME")
@@ -25,7 +25,6 @@ for file in os.listdir("/Volumes/Extreme SSD/ceebios"):
     print("Number of inserted articles: ")
     print(len(result.inserted_ids))
     print(f"done with {file}")
-
 
 running_sum = 0
 for post in posts.find():

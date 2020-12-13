@@ -12,20 +12,16 @@ Created on Sat Nov 21 16:35:50 2020
 @author: CHRISTIAN
 """
 
-
 # D:\ecomdataforgoodfr\Ceebios\base_open_source
 
 
-import glob
 import getopt
-
+import glob
 import gzip
 import io
-
 import ntpath
-
-import time
 import pprint
+import time
 
 pp = pprint.PrettyPrinter(2)
 import json
@@ -36,7 +32,6 @@ pd.set_option("display.max_rows", 500)
 pd.set_option("display.max_columns", 500)
 pd.set_option("display.width", 1000)
 pd.set_option("max_colwidth", 1000)
-
 
 if False:  # local desktop working
     os.chdir("D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/base_open_source")

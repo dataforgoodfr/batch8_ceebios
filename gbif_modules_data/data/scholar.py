@@ -16,6 +16,7 @@ import pprint
 
 # pip install scholarly
 from scholarly import scholarly
+
 from .publication import Publication
 
 

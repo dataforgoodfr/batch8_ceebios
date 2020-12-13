@@ -1,7 +1,6 @@
 import pandas as pd
 import plotly.express as px
 
-
 HIERARCHY = ["kingdom", "phylum", "class", "order", "family", "genus", "species"]
 
 

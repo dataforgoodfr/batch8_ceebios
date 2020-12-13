@@ -9,12 +9,11 @@ http://tecfa.unige.ch/perso/lombardf/calvin/teaching/mammiferes-fr-latin.html
 @author: CHRISTIAN
 """
 
-
-import os
-import time
-import pprint
 import json
+import pprint
 import re
+import time
+
 import pandas as pd
 
 pd.set_option("display.max_rows", 500)
@@ -30,7 +29,6 @@ from pygbif import species
 from scipy import sparse
 import pickle
 from scipy.spatial import distance
-
 
 if False:  # local desktop working
     os.chdir("D:/ecomdataforgoodfr/Ceebios/batch8_ceebios/lib")

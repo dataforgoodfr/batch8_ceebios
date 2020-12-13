@@ -1,5 +1,6 @@
-import requests
 import urllib
+
+import requests
 
 from .publication import Publication
 

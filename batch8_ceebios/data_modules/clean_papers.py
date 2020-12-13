@@ -17,7 +17,6 @@ from .utils import (
     add_entities,
     list_stopwords,
     add_all_ids_to_species,
-    remove_empty_titles,
 )
 
 

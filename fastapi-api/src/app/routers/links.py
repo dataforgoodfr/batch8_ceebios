@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException
 from app import schemas
 from app.db.db import db
+from fastapi import APIRouter, HTTPException
 
 router = APIRouter()
 
