@@ -132,6 +132,7 @@ dmypy.json
 
 .idea
 .DS_Store
+.ipynb_checkpoints
 
 # too heavy data files for github
 data/categories_id.csv
