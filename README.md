@@ -13,7 +13,6 @@ and nicer search and visualization of animal species in the biomimicry field.
 ├── notebooks/              # Exploratory jupyter notebooks
 ├── batch8_ceebios/         # Python main module of this repository: clean GBIF taxon & Semantic Scholar, add all articles to MongoDB
 ├── gbif_modules_data/      # Python module used to clean some GBIF database 
-├── lib/                    # Python library for multiprocessing
 ├── fastapi-api/            # Fast API connected to MongoDB
 ├── requirements.txt        # Project requirements
 ├── LICENSE
