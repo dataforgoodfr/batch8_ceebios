@@ -13,13 +13,24 @@ MONGO_UNSERNAME = os.getenv("MONGO_USERNAME")
 MONGO_PASSWORD = os.getenv("MONGO_PASSWORD")
 
 
-client = MongoClient(host=MONGO_HOST, port=MONGO_PORT, username=MONGO_UNSERNAME,  password=MONGO_PASSWORD)
-db1 = client[MONGO_dbname]
+
+def load_conf_mongo(host, port, username, password, dbname, col):
+    ''' open mongodb client and cursor on one collection '''
+    
+    client = MongoClient(host=host, port=port, username=username,  password=password)
+    db1 = client[dbname]
+    cursor = db1[col]
+    return client, cursor
+    
+
 
 # now you have one cursor for collection species, and a second for documents
 
-cursor_species = db1['species']
-cursor_documents = db1['documents']
+client_species, cursor_species = load_conf_mongo(MONGO_HOST, MONGO_PORT, \
+                                                 MONGO_UNSERNAME, MONGO_PASSWORD, dbname, 'species')
+client_documents, cursor_documents = load_conf_mongo(MONGO_HOST, MONGO_PORT, \
+                                                     MONGO_UNSERNAME, MONGO_PASSWORD, dbname, 'documents)
+
 
 print('- cursors to write or find into Mongodb:')
 print('cursor_species', cursor_species)
@@ -51,4 +62,5 @@ for post in posts.find():
 print(running_sum)
 
 # fermeture 
-client.close()
+client_documents.close()
+client_species.close()
