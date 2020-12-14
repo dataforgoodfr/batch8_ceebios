@@ -15,7 +15,7 @@ class Author(BaseModel):
 class Document(BaseModel):
     _id: ObjectId
     _inserted_at: datetime = Field(default_factory=datetime.utcnow)
-    doc_id: int
+    doc_id: str
     doi: str
     title: str
     abstract: str
@@ -26,7 +26,7 @@ class Document(BaseModel):
     tags: Optional[List[str]] = []
     authors: Optional[List[Author]] = []
     _content: Dict
-    related_taxons: List[Taxon] = []
+    related_taxons: List[Taxon] = Field([], alias="dict_species")
 
     class Config:
         schema_extra = {
@@ -45,7 +45,7 @@ class Document(BaseModel):
                     {"name": "Leah C Hammond", "ids": ["39777352"]},
                     {"name": "Courtney M Karner", "ids": ["4880657"]},
                 ],
-                "related_taxons": [
+                "dict_species": [
                     {"gbif_id": 1, "rank": "class", "canonical_name": "test"}
                 ],
             }

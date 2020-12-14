@@ -6,7 +6,7 @@ router = APIRouter()
 
 
 @router.put("/add_reference/{doc_id}/{gbif_id}", response_model=schemas.Document)
-async def link_document_to_specy(gbif_id: int, doc_id: int):
+async def link_document_to_specy(gbif_id: int, doc_id: str):
     document = await db.documents.find_one({"doc_id": doc_id})
     if document is None:
         raise HTTPException(
@@ -17,11 +17,11 @@ async def link_document_to_specy(gbif_id: int, doc_id: int):
         raise HTTPException(
             status_code=404, detail=f"specy id:{gbif_id} does not exists"
         )
-    if taxon not in document["related_taxons"]:
-        document["related_taxons"] += [taxon]
+    if taxon not in document["dict_species"]:
+        document["dict_species"] += [taxon]
         await db.documents.update_one(
             {"doc_id": doc_id},
-            {"$set": {"related_taxons": document["related_taxons"]}},
+            {"$set": {"dict_species": document["dict_species"]}},
         )
         return document
     else:

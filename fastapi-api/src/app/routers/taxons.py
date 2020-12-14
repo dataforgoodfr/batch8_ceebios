@@ -49,10 +49,10 @@ async def create_taxon(taxon: schemas.Taxon):
 
 @router.get("/taxon/{gbif_id}/related_documents", response_model=List[schemas.Document])
 async def get_related_documents(gbif_id: int):
-    taxon = await db.taxons.find_one({"gbif_id": gbif_id})
-    if taxon is None:
-        raise HTTPException(status_code=404, detail="species not found")
-    cursor = db.documents.find({"related_taxons.gbif_id": gbif_id})
+    # taxon = await db.taxons.find_one({"gbif_id": gbif_id})
+    # if taxon is None:
+    #     raise HTTPException(status_code=404, detail="species not found")
+    cursor = db.documents.find({"dict_species.gbif_id": gbif_id})
     related_documents = []
     for doc in await cursor.to_list(length=100):
         related_documents.append(doc)

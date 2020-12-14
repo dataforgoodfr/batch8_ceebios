@@ -29,7 +29,7 @@ async def text_search_documents(query: str):
 
 
 @router.get("/document/{doc_id}", response_model=schemas.Document)
-async def read_document(doc_id: int):
+async def read_document(doc_id: str):
     document = await db.documents.find_one({"doc_id": doc_id})
     print(document)
     if document is None:
