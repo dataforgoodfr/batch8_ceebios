@@ -27,9 +27,9 @@ def load_conf_mongo(host, port, username, password, dbname, col):
 # now you have one cursor for collection species, and a second for documents
 
 client_species, cursor_species = load_conf_mongo(MONGO_HOST, MONGO_PORT, \
-                                                 MONGO_UNSERNAME, MONGO_PASSWORD, dbname, 'species')
+                                                 MONGO_UNSERNAME, MONGO_PASSWORD, MONGO_dbname, 'species')
 client_documents, cursor_documents = load_conf_mongo(MONGO_HOST, MONGO_PORT, \
-                                                     MONGO_UNSERNAME, MONGO_PASSWORD, dbname, 'documents)
+                                                     MONGO_UNSERNAME, MONGO_PASSWORD, MONGO_dbname, 'documents)
 
 
 print('- cursors to write or find into Mongodb:')
